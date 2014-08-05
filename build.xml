@@ -1,0 +1,82 @@
+<project name="Ant-task" default="dist" basedir=".">
+
+   <property name="src" location="src"/>
+   <property name="build" location="build"/>
+   <property name="dist"  location="dist"/>
+   <property name="lib"  location="lib"/>
+   <property name="test"  location="test"/>
+    <property name="jar"  location="jar"/>
+    <property name="tmp"  location="tmp"/>
+   <loadproperties srcfile="project.properties"/>
+
+    <path id="lib.class.path">
+        <fileset dir="${lib}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="init">
+    <tstamp>
+    <format property="TODAY_GB" pattern="d-MMMM-yyyy" locale="en,GB"/>
+    </tstamp>
+    <mkdir dir="${build}"/>
+    </target>
+
+  <target name="compile" depends="init" >
+    <javac srcdir="${src}" destdir="${build}" classpathref="lib.class.path"/>
+  </target>
+
+
+<target name="test-compile" depends="compile">
+    <mkdir dir="${build}/test"/>
+    <javac srcdir="${test}" destdir="${build}/test"
+           optimize="on" debug="on" deprecation="on"
+           classpath="${build}/classes" includeantruntime="no">
+      <compilerarg value="-Xlint"/>
+      <classpath refid="lib.class.path"/>
+    </javac>
+    <copy todir="${build}/test">
+      <fileset dir="${test}" excludes="**/*.java"/>
+    </copy>
+  </target>
+
+  <target name="test" depends="test-compile" description="Run the unit tests.">
+    <junit fork="yes">
+      <classpath>
+        <pathelement path="${build}/test"/>
+        <path refid="lib.class.path"/>
+      </classpath>
+      <batchtest>
+        <formatter type="xml"/>
+        <fileset dir="${build}/test"/>
+      </batchtest>
+    </junit>
+  </target>
+
+<target name="jar" depends="test">
+    <mkdir dir="${jar}"/>
+    <jar jarfile="${jar}/Ant-task.jar" basedir="${build}">
+      <manifest>
+<attribute name="Main-class" value="com.test.Project"/>
+      </manifest>
+</jar>
+
+  </target>
+
+ <target name="dist" depends="jar">
+    <mkdir dir="${dist}"/>
+      <copy file="${jar}/Ant-task.jar" todir="${tmp}"/>
+      <copy todir="${tmp}">
+      <fileset dir="${lib}"/>
+     </copy>
+      <copy file="project.properties" todir="${tmp}"/>
+    <zip destfile="${tmp}/${TODAY_GB}_project.zip"
+    basedir="${tmp}"/>
+</target>
+
+  
+  <target name="clean">
+    <delete dir="${build}"/>
+    <delete dir="${dist}"/>
+  </target>
+</project>
