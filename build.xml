@@ -65,7 +65,7 @@
 
  <target name="dist" depends="jar">
     <mkdir dir="${dist}"/>
-      <copy file="${jar}/Ant-task.jar" todir="${tmp}"/>
+          <copy file="${jar}/Ant-task.jar" todir="${tmp}"/>
       <copy todir="${tmp}">
       <fileset dir="${lib}"/>
      </copy>
@@ -78,5 +78,6 @@
   <target name="clean">
     <delete dir="${build}"/>
     <delete dir="${dist}"/>
+  <delete dir="${tmp}"/>
   </target>
 </project>
